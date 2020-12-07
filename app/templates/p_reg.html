@@ -2,16 +2,16 @@
 
 {% block extra %}
 <div class="form-group">
-    {{ form.usn.label(class="form-control-label") }}
-    {% if form.usn.errors %}
-        {{ form.usn(class="form-control form-control-lg is-invalid") }}
+    {{ form.s_email.label(class="form-control-label") }}
+    {% if form.s_email.errors %}
+        {{ form.s_email(class="form-control form-control-lg is-invalid") }}
         <div class="invalid-feedback">
-            {% for error in form.usn.errors %}
+            {% for error in form.s_email.errors %}
                 <span>{{ error }}</span>
             {% endfor %}
         </div>
     {% else %}
-        {{ form.usn(class="form-control form-control-lg") }}
+        {{ form.s_email(class="form-control form-control-lg") }}
     {% endif %}
 </div>
 <div class="form-group">
@@ -28,4 +28,3 @@
     {% endif %}
 </div>
 {% endblock %}
-

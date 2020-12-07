@@ -1,0 +1,17 @@
+{% extends "register.html" %}
+
+{% block extra %}
+<div class="form-group">
+    {{ form.dept_id.label(class="form-control-label") }}
+    {% if form.dept_id.errors %}
+        {{ form.dept_id(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.dept_id.errors %}
+                <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ form.dept_id(class="form-control form-control-lg") }}
+    {% endif %}
+</div>
+{% endblock %}

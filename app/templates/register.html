@@ -5,20 +5,36 @@
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Join Today</legend>
-                <div class="form-group">
-                    {{ form.username.label(class="form-control-label") }}
 
-                    {% if form.username.errors %}
-                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                <div class="form-group">
+                    {{ form.f_name.label(class="form-control-label") }}
+
+                    {% if form.f_name.errors %}
+                        {{ form.f_name(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.username.errors %}
+                            {% for error in form.f_name.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.username(class="form-control form-control-lg") }}
+                        {{ form.f_name(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
+                <div class="form-group">
+                    {{ form.l_name.label(class="form-control-label") }}
+
+                    {% if form.l_name.errors %}
+                        {{ form.l_name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.l_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.l_name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
                 <div class="form-group">
                     {{ form.email.label(class="form-control-label") }}
                     {% if form.email.errors %}
@@ -46,18 +62,20 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.confirm_password.label(class="form-control-label") }}
-                    {% if form.confirm_password.errors %}
-                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                    {{ form.repeat_password.label(class="form-control-label") }}
+                    {% if form.repeat_password.errors %}
+                        {{ form.repeat_password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.confirm_password.errors %}
+                            {% for error in form.repeat_password.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                        {{ form.repeat_password(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
+                {% block extra %}
+                {% endblock %}
             </fieldset>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
@@ -69,4 +87,6 @@
             Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
         </small>
     </div>
+    <br>
+    <br>
 {% endblock content %}
