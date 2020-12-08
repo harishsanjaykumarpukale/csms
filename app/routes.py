@@ -118,7 +118,7 @@ def p_register():
     
     form = ParentRegForm()
     if form.validate_on_submit():
-        user = User(email_id = form.email.data, type = "counsellor")
+        user = User(email_id = form.email.data, type = "parent")
         user.set_password(form.password.data)
         db.session.add(user)
 
