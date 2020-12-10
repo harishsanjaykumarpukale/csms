@@ -1,5 +1,17 @@
 {% extends "register.html" %}
 
+{% block ocr %}
+<div class="text-center">
+    <a href="{{ url_for('reg_ocr')}}" class="btn btn-primary" role="button">Register through OCR</a>
+</div>
+<br>
+<br>
+<p class="text-center">OR</p>
+<p class="text-center">Fill the details and register </p>
+<br>
+<br>
+{% endblock %}
+
 {% block extra %}
 <div class="form-group">
     {{ form.usn.label(class="form-control-label") }}

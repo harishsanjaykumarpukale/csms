@@ -1,6 +1,6 @@
 import cv2
 import pytesseract
-from pdf2image import convert_from_path
+from pdf2image import convert_from_bytes
 import numpy as np
 
 def get_string(roi):
@@ -9,9 +9,10 @@ def get_string(roi):
 
     return text.split()
 
-def get_student_details(filepath):
+def get_student_details(pdfbytes):
 
-    pages = convert_from_path(filepath, 350)
+    # pages = convert_from_path(filepath, 350)
+    pages  = convert_from_bytes(pdfbytes, 350)
     # pages[0].save("page1.jpg","JPEG")
 
     # img = cv2.imread("page1.jpg")

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-section">
+    <form method="POST" action="" enctype=multipart/form-data >
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Register through OCR </legend>
+            
+            <div class="form-group">
+                {{ form.file.label(class="form-control-label") }}
+                {% if form.file.errors %}
+                    {{ form.file(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.file.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.file(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </fieldset>   
+    </form>    
+</div>
+{% if txtrecgnised %}
+<br>
+<br>
+<p class="text-center">The following Student User is registred successfully!! </p>
+<p class="text-left">FIRST NAME : {{ txtrecgnised['f_name'] }}</p>
+<p class="text-left">LAST NAME : {{ txtrecgnised['l_name'] }}</p>
+<p class="text-left">USN : {{ txtrecgnised['usn'] }}</p>
+<!-- <p class="text-left">EMAIL : {{ txtrecgnised['s_email'] }}</p>
+<p class="text-left">Counsellor's Email : {{ txtrecgnised['c_email'] }}</p> -->
+<p><strong>Please Note:</strong> Password is set to "Ab1234" </p>
+<br>
+<br> 
+{% endif %}
+{% endblock %}

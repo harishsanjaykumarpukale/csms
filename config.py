@@ -10,3 +10,6 @@ class Config(object):
 
     SQLALCHEMY_ECHO = True
 
+    # define a folder to store and later serve the images
+    UPLOAD_FOLDER = '/uploads/'
+

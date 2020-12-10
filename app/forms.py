@@ -4,12 +4,14 @@ from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from app.models import User,Student
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+import re
 
 
 class RegistrationForm(FlaskForm):
     email = StringField('Email',validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators = [DataRequired()])
-    repeat_password = PasswordField('Repeat Password', validators = [DataRequired(),EqualTo('password')])
+    repeat_password = PasswordField('Repeat Password', validators = [DataRequired(),EqualTo('password', message='Passwords must match')])
     f_name = StringField('First Name', validators = [DataRequired()])
     l_name = StringField('Last Name', validators = [DataRequired()])
     submit = SubmitField('Register')
@@ -18,6 +20,20 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email_id=email.data).first()
         if user is not None:
             raise ValidationError("This email-id is already registered !!")
+    
+    def validate_password(self, password):
+        if len(password)<6 or len(password)>14:
+            raise ValidationError("Password length should be between 6 to 14")
+
+        if re.search("(?=.*?[A-Z])", password) is None:
+            raise ValidationError("Password must have atleast one Uppercase letter")
+        
+        if re.search("(?=.*?[a-z])", password) is None:
+            raise ValidationError("Password must have atleast one Lowercase letter")
+        
+        if re.search("(?=.*?[0-9])", password) is None:
+            raise ValidationError("Password must have atleast one digit ")
+        
 
 class StudentRegForm(RegistrationForm):
     
@@ -65,3 +81,8 @@ class LoginForm(FlaskForm):
     #         user = User.query.filter_by(email=email.data).first()
     #         if user:
     #             raise ValidationError('That email is taken. Please choose a different one.')
+
+
+class OCRInputForm(FlaskForm):
+    file = FileField('Choose the PDF file of Registration', validators = [FileRequired(), FileAllowed(['pdf'],"PDF only")])
+    submit = SubmitField('Upload')

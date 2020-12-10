@@ -1,6 +1,6 @@
 from pdf2image import convert_from_path
 
-pdfs = r"5_6138656761713787275.pdf"
+pdfs = r"OCR/5_6138656761713787275.pdf"
 pages = convert_from_path(pdfs, 350)
 
 i = 1

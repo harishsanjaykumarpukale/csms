@@ -1,9 +1,17 @@
 from app import app,db
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm, StudentRegForm, ConsellorRegForm, ParentRegForm
+from app.forms import LoginForm, StudentRegForm, ConsellorRegForm, ParentRegForm, OCRInputForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Student, Counsellor, Parent
 from werkzeug.urls import url_parse
+from OCR.ocr_student_pdf import get_student_details
+
+# allow files of a specific type
+ALLOWED_EXTENSIONS = set(['pdf'])
+
+# function to check the file extension
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/")
 @app.route("/home")
@@ -131,3 +139,37 @@ def p_register():
 
         return redirect(url_for('login'))
     return render_template('p_reg.html', form = form)
+
+@app.route("/reg_ocr", methods = ['GET','POST'])
+def reg_ocr():
+    form = OCRInputForm()
+    if request.method == 'POST':
+
+        # check if there is a file in the request
+        if 'file' not in request.files:
+            flash("No file selected","error")
+            return redirect(url_for('reg_ocr'))
+        
+        file = request.files['file']
+        
+        # if no file is selected
+        if file.filename == '':
+            flash("No file selected","error")
+            return redirect(url_for('reg_ocr'))
+
+        if file and allowed_file(file.filename):
+            student = get_student_details(file.read())
+            print(student)
+            user = User(email_id = student['s_email'], type = "student")
+            user.set_password("Ab1234")
+            db.session.add(user)
+            student = Student(s_email_id = student['s_email'], f_name = student['f_name'], l_name = student['l_name'], usn = student['usn'], c_email_id = student['c_email'])
+            db.session.add(student)
+
+            db.session.commit()
+
+            flash("You have registerd succesfully!! ","success")
+
+            return render_template('reg_ocr.html',title = "Successful Registration - CSMS", form = form,txtrecgnised = student)
+
+    return render_template('reg_ocr.html', title = "Upload PDF - CSMS", form = form)
