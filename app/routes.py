@@ -23,7 +23,7 @@ def home():
         return redirect(url_for('c_home'))
     if current_user.type == "parent":
         return redirect(url_for('p_home'))
-    return render_template('index.html',title = "Home")
+    return render_template('404.html',title = "404")
 
 @app.route("/about")
 def about():
@@ -63,17 +63,17 @@ def account():
 @app.route("/s_home")
 @login_required
 def s_home():
-    return render_template('s_home.html')
+    return render_template('student/s_home.html')
 
 @app.route("/c_home")
 @login_required
 def c_home():
-    return render_template('c_home.html')
+    return render_template('counsellor/c_home.html')
 
 @app.route("/p_home")
 @login_required
 def p_home():
-    return render_template('p_home.html')
+    return render_template('parent/p_home.html')
 
 @app.route("/s_register", methods = ['GET','POST'])
 def s_register():
@@ -95,7 +95,7 @@ def s_register():
 
         return redirect(url_for('login'))
     
-    return render_template('s_reg.html', form = form)
+    return render_template('student/s_reg.html', form = form)
 
 @app.route("/c_register", methods = ['GET','POST'])
 def c_register():
@@ -117,7 +117,7 @@ def c_register():
 
         return redirect(url_for('login'))
 
-    return render_template('c_reg.html', form = form)
+    return render_template('counsellor/c_reg.html', form = form)
 
 @app.route("/p_register", methods = ['GET','POST'])
 def p_register():
@@ -138,7 +138,7 @@ def p_register():
         flash("You have registerd succesfully!! ","success")
 
         return redirect(url_for('login'))
-    return render_template('p_reg.html', form = form)
+    return render_template('parent/p_reg.html', form = form)
 
 @app.route("/reg_ocr", methods = ['GET','POST'])
 def reg_ocr():
@@ -161,6 +161,11 @@ def reg_ocr():
             student = get_student_details(file.read())
             print(student)
             user = User(email_id = student['s_email'], type = "student")
+            userexists = User.query.filter_by(email_id=user.email_id).first()
+            if userexists is not None:
+                flash("Student already registered","danger")
+                return redirect(url_for('reg_ocr'))
+            
             user.set_password("Ab1234")
             db.session.add(user)
             student = Student(s_email_id = student['s_email'], f_name = student['f_name'], l_name = student['l_name'], usn = student['usn'], c_email_id = student['c_email'])
@@ -172,4 +177,4 @@ def reg_ocr():
 
             return render_template('reg_ocr.html',title = "Successful Registration - CSMS", form = form,txtrecgnised = student)
 
-    return render_template('reg_ocr.html', title = "Upload PDF - CSMS", form = form)
+    return render_template('student/reg_ocr.html', title = "Upload PDF - CSMS", form = form)
