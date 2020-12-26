@@ -2,20 +2,35 @@
 
 {% block content %}
 
-<h1>Student</h1>
+<h1>Student </h1>
+<br>
+<br>
+<a href="#" class="btn btn-primary btn-block col-md-8">Assessment</a>
 
+
+<br>
+<br>
+<a href="#" class="btn btn-primary btn-block col-md-8">Attendance</a>
+
+<br>
+<br>
+<a href="#" class="btn btn-primary btn-block col-md-8">HSS Activity </a>
+
+
+{% endblock %}
+
+{% block rightside %}
 <div class="col-md-4">
-          <div class="content-section">
-            <h3>Dashboard</h3>
-            <p class='text-muted'>Gist of sensor functions.
-              <ul class="list-group">
-                <li id ="LeakDetect"class="list-group-item list-group-item-light">Leakage Detected: </li>
-                <li class="list-group-item list-group-item-light">Differential Flow Rates: Normal</li>
-                <li class="list-group-item list-group-item-light">Pipeline Health: Good</li>
-                <li class="list-group-item list-group-item-light">Leakage Positions: </li>
-              </ul>
-            </p>
-          </div>
-        </div>
-
+  <div class="content-section">
+    <h3>Dashboard</h3>
+    <p class='text-muted'>Gist of sensor functions.
+      <ul class="list-group">
+        <li id ="LeakDetect" class="list-group-item list-group-item-light">CGPA: </li>
+        <!-- <li class="list-group-item list-group-item-light">Differential Flow Rates: Normal</li>
+        <li class="list-group-item list-group-item-light">Pipeline Health: Good</li>
+        <li class="list-group-item list-group-item-light">Leakage Positions: </li> -->
+      </ul>
+    </p>
+  </div>
+</div>
 {% endblock %}
