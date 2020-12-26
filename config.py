@@ -8,7 +8,7 @@ class Config(object):
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
     # define a folder to store and later serve the images
     UPLOAD_FOLDER = '/uploads/'

@@ -22,16 +22,16 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("This email-id is already registered !!")
     
     def validate_password(self, password):
-        if len(password)<6 or len(password)>14:
+        if len(password.data)<6 or len(password.data)>14:
             raise ValidationError("Password length should be between 6 to 14")
 
-        if re.search("(?=.*?[A-Z])", password) is None:
+        if re.search("(?=.*?[A-Z])", password.data) is None:
             raise ValidationError("Password must have atleast one Uppercase letter")
         
-        if re.search("(?=.*?[a-z])", password) is None:
+        if re.search("(?=.*?[a-z])", password.data) is None:
             raise ValidationError("Password must have atleast one Lowercase letter")
         
-        if re.search("(?=.*?[0-9])", password) is None:
+        if re.search("(?=.*?[0-9])", password.data) is None:
             raise ValidationError("Password must have atleast one digit ")
         
 
@@ -39,7 +39,9 @@ class StudentRegForm(RegistrationForm):
     
     usn = StringField('USN', validators = [DataRequired()])
     c_email = StringField('Counsellor\'s email-id', validators = [Email()])
-    
+    departments = ['CSE','ISE','ECE']
+    dept_id = SelectField('Department',choices=departments,validators=[DataRequired()])
+
     def validate_usn(self, usn):
         student = Student.query.filter_by(usn = usn.data).first()
         if student is not None:

@@ -5,6 +5,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Student, Counsellor, Parent
 from werkzeug.urls import url_parse
 from OCR.ocr_student_pdf import get_student_details
+from datetime import date
 
 # allow files of a specific type
 ALLOWED_EXTENSIONS = set(['pdf'])
@@ -86,7 +87,7 @@ def s_register():
         user = User(email_id = form.email.data, type = "student")
         user.set_password(form.password.data)
         db.session.add(user)
-        student = Student(s_email_id = form.email.data, f_name = form.f_name.data, l_name = form.l_name.data, usn = form.usn.data, c_email_id = form.c_email.data)
+        student = Student(s_email_id = form.email.data, f_name = form.f_name.data, l_name = form.l_name.data, usn = form.usn.data, dept_id = form.dept_id.data, doj = date(2000+int(form.usn.data[3:5]),7,1), c_email_id = form.c_email.data)
         db.session.add(student)
 
         db.session.commit()
@@ -168,13 +169,13 @@ def reg_ocr():
             
             user.set_password("Ab1234")
             db.session.add(user)
-            student = Student(s_email_id = student['s_email'], f_name = student['f_name'], l_name = student['l_name'], usn = student['usn'], c_email_id = student['c_email'])
+            student = Student(s_email_id = student['s_email'], f_name = student['f_name'], l_name = student['l_name'], usn = student['usn'], dept_id = student['usn'][5:7]+"E", doj = date(2000+int(student['usn'][3:5]),7,1),c_email_id = student['c_email'])
             db.session.add(student)
 
             db.session.commit()
 
             flash("You have registerd succesfully!! ","success")
 
-            return render_template('reg_ocr.html',title = "Successful Registration - CSMS", form = form,txtrecgnised = student)
+            return render_template('student/reg_ocr.html',title = "Successful Registration - CSMS", form = form,txtrecgnised = student)
 
-    return render_template('student/reg_ocr.html', title = "Upload PDF - CSMS", form = form)
+    return render_template('student/reg_ocr.html', title = "Upload PDF", form = form)
