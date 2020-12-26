@@ -10,6 +10,8 @@ class Config(object):
 
     SQLALCHEMY_ECHO = False
 
+    MONGO_URI = os.environ.get('MONGO_DATABSE_URI') or 'mongodb://localhost:27017/test'
+
     # define a folder to store and later serve the images
     UPLOAD_FOLDER = '/uploads/'
 

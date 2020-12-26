@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{crs.course_code + "  " + crs.course_name}}</h1>
+
+<div class="content-section">
+    <ul>
+        <li class="list-group-item list-group-item-light">Quiz 1 - {{marks['Q1']}}  | CIE 1 - {{marks["CIE1"]}}</li>
+        <li class="list-group-item list-group-item-light">Quiz 2 - {{marks['Q2']}}  | CIE 2 - {{marks["CIE2"]}}</li>
+        <li class="list-group-item list-group-item-light">Quiz 3 - {{marks['Q3']}}  | CIE 3 - {{marks["CIE3"]}}</li>
+        {% if marks['lab'] %}
+        <li class="list-group-item list-group-item-light">LAB - {{marks['LAB']}}  </li>
+        {% endif %}
+    
+    </ul>
+</div>
+
+{% endblock %}
