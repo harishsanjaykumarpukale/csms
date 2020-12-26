@@ -2,7 +2,7 @@ from app import app,db
 from flask import render_template, flash, redirect, url_for, request
 from app.forms import LoginForm, StudentRegForm, ConsellorRegForm, ParentRegForm, OCRInputForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Student, Counsellor, Parent
+from app.models import *
 from werkzeug.urls import url_parse
 from OCR.ocr_student_pdf import get_student_details
 from datetime import date
@@ -38,11 +38,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email_id = form.email.data).first()
         if (user is None) or (not user.check_password(form.password.data)) :
-            if user is None:
-                flash("Invalid user","danger")
-            else:
-                flash("Invalid password ","danger")
-                print(form.password.data)
+            # if user is None:
+            #     flash("Invalid user","danger")
+            # else:
+            #     flash("Invalid password ","danger")
+            #     print(form.password.data)
             flash('Invalid email-id or password','danger')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember.data)
@@ -179,3 +179,18 @@ def reg_ocr():
             return render_template('student/reg_ocr.html',title = "Successful Registration - CSMS", form = form,txtrecgnised = student)
 
     return render_template('student/reg_ocr.html', title = "Upload PDF", form = form)
+
+
+@app.route("/s_assessment")
+def s_assessment():
+    # print(current_user.email_id)
+    course_code_list = StudentCourseDetails.query.filter_by(s_email_id = current_user.email_id, date = date(2020, 7, 1))
+    # print(course_list[0])
+    course_list = []
+
+    for each in course_code_list:
+        course = Course.query.filter_by(course_code = each.course_code).first()
+        print(course)
+        course_list.append(course)
+    
+    return render_template('student/s_assessment.html', courses = course_list)
