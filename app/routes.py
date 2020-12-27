@@ -203,7 +203,7 @@ def s_assessment():
 @app.route("/s_assessment_detail")
 @login_required
 def s_assessment_detail():
-    code = request.args.get('course_code', 0, type=str)
+    code = request.args.get('course_code', "18CS52", type=str)
     course = Course.query.filter_by(course_code = code).first()
     USN = Student.query.filter_by(s_email_id = current_user.email_id).first().usn 
     marks = mongo.db.marks.find_one( { "usn" : USN })
@@ -219,6 +219,10 @@ def s_assessment_detail():
 @app.route("/s_attendance", methods = ['GET','POST'])
 @login_required
 def s_attendance():
+
+    # if request.method == "POST":
+    #     if form_list[0].validate_on_submit:
+
     
     USN = Student.query.filter_by(s_email_id = current_user.email_id).first().usn
     data = mongo.db.attd.find_one({ "usn" : USN })
@@ -236,5 +240,45 @@ def s_attendance():
         form = FileInputForm()
         form.course_code = each.course_code
         form_list.append(form)
+    
+    
+    # if form_list[0].validate_on_submit:
+    #     return redirect(url_for('s_attendance'))
 
     return render_template('student/s_attendance.html', attd = data, courses = course_list, forms = form_list)
+
+
+@app.errorhandler(413)
+def too_large(e):
+    return "File is too large", 413
+
+@app.route("/s_attendance_update", methods = ["GET", "POST"])
+def s_attendance_update():
+    form = FileInputForm()
+    code = request.args.get('course_code', "18CS52", type=str)
+    if request.method == 'POST':
+
+        # check if there is a file in the request
+        if 'file' not in request.files:
+            flash("No file selected","error")
+            return redirect(url_for('s_attendance_update'))
+        
+        file = request.files['file']
+        
+        # if no file is selected
+        if file.filename == '':
+            flash("No file selected","error")
+            return redirect(url_for('s_attendance_update'))
+        
+        if not allowed_file(file.filename):
+            flash("Only PDF files allowed ","error")
+            return redirect(url_for('s_attendance_update'))
+        
+        if file and allowed_file(file.filename):
+            
+
+            flash("File uploaded succesfully!! ","success")
+
+            return redirect(url_for('s_attendance'))
+
+    return render_template('student/s_attendance_update.html', form = form)

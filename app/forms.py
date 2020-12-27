@@ -90,6 +90,10 @@ class OCRInputForm(FlaskForm):
     submit = SubmitField('Upload')
 
 class FileInputForm(FlaskForm):
-    course_code = ""
-    file = FileField('Choose the PDF/JPG files ', validators = [FileRequired(), FileAllowed(['pdf', 'jpg'],"PDF/JPG  only")])
+    file = FileField('Choose the PDF file', validators = [FileRequired(), FileAllowed(['pdf'],"PDF only")])
     submit = SubmitField('Upload')
+
+    # def validate_file(self, file):
+    #     # if(len(file.data))
+    #     # print(len(file.data))
+    #     raise ValidationError(len(file.data))
