@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from app.models import User,Student
 from flask_wtf.file import FileField, FileAllowed, FileRequired
@@ -97,3 +97,10 @@ class FileInputForm(FlaskForm):
     #     # if(len(file.data))
     #     # print(len(file.data))
     #     raise ValidationError(len(file.data))
+
+class HSSActivityDetailForm(FlaskForm):
+    title = StringField('Title', validators=[Length(min=5, max=8)])
+    date = DateField('Date in YYYY-MM-DD', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[Length(min=8, max=100)])
+    file = FileField('Choose the PDF file', validators = [FileRequired(), FileAllowed(['pdf'],"PDF only")])
+    submit = SubmitField('Submit')

@@ -282,3 +282,12 @@ def s_attendance_update():
             return redirect(url_for('s_attendance'))
 
     return render_template('student/s_attendance_update.html', form = form)
+
+@app.route("/s_hss", methods = ["GET", "POST"])
+def s_hss():
+    form = HSSActivityDetailForm()
+    if form.validate_on_submit():
+        
+        flash("HSS Actvity details submitted succesfully!! ", "success")
+        return redirect(url_for('s_hss'))
+    return render_template('student/s_hss.html', form = form)
