@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Attendance Details</h1> 
+
+<div class="content-section">
+    <ul>
+        {% for i in range(courses|length) %}
+        <li class="list-group-item list-group-item">
+            <legend class="border-bottom mb-4">{{courses[i].course_code + "  " +  courses[i].course_name}}</legend>
+            <b>{{attd[courses[i].course_code]["percentage"]}}</b>
+        </li>
+        <br>
+        <form method="POST" action="" enctype=multipart/form-data >
+            {{ forms[i].hidden_tag() }}
+            <fieldset class="form-group">
+                <!-- <legend class="border-bottom mb-4">Register through OCR </legend> -->
+                
+                <div class="form-group">
+                    {{ forms[i].file.label(class="form-control-label") }}
+                    {% if forms[i].file.errors %}
+                        {{ forms[i].file(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in forms[i].file.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ forms[i].file(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+    
+                <div class="form-group">
+                    {{ forms[i].submit(class="btn btn-outline-info") }}
+                </div>
+            </fieldset>   
+        </form>
+
+        <br>
+        <br>
+        
+        {% endfor %}
+    
+    </ul>
+</div>
+
+{% endblock %}

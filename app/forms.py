@@ -88,3 +88,8 @@ class LoginForm(FlaskForm):
 class OCRInputForm(FlaskForm):
     file = FileField('Choose the PDF file of Registration', validators = [FileRequired(), FileAllowed(['pdf'],"PDF only")])
     submit = SubmitField('Upload')
+
+class FileInputForm(FlaskForm):
+    course_code = ""
+    file = FileField('Choose the PDF/JPG files ', validators = [FileRequired(), FileAllowed(['pdf', 'jpg'],"PDF/JPG  only")])
+    submit = SubmitField('Upload')

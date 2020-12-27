@@ -1,6 +1,6 @@
 from app import app,db,mongo
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm, StudentRegForm, ConsellorRegForm, ParentRegForm, OCRInputForm
+from app.forms import *
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import *
 from werkzeug.urls import url_parse
@@ -157,7 +157,11 @@ def reg_ocr():
         if file.filename == '':
             flash("No file selected","error")
             return redirect(url_for('reg_ocr'))
-
+        
+        if not allowed_file(file.filename):
+            flash("Only PDF files allowed ","error")
+            return redirect(url_for('reg_ocr'))
+        
         if file and allowed_file(file.filename):
             student = get_student_details(file.read())
             print(student)
@@ -186,12 +190,12 @@ def reg_ocr():
 def s_assessment():
     # print(current_user.email_id)
     course_code_list = StudentCourseDetails.query.filter_by(s_email_id = current_user.email_id, date = date(2020, 7, 1))
-    # print(course_list[0])
+    
     course_list = []
 
     for each in course_code_list:
         course = Course.query.filter_by(course_code = each.course_code).first()
-        print(course)
+        # print(course)
         course_list.append(course)
     
     return render_template('student/s_assessment.html', courses = course_list)
@@ -201,7 +205,8 @@ def s_assessment():
 def s_assessment_detail():
     code = request.args.get('course_code', 0, type=str)
     course = Course.query.filter_by(course_code = code).first()
-    marks = mongo.db.marks.find_one( { "usn" : "IRV18CS062" })
+    USN = Student.query.filter_by(s_email_id = current_user.email_id).first().usn 
+    marks = mongo.db.marks.find_one( { "usn" : USN })
     data = marks["5"][code]
     keys = ['Q1','CIE1','Q2','CIE2','Q3','CIE3']
     for each in keys:
@@ -210,3 +215,26 @@ def s_assessment_detail():
     if data["lab"] and "LAB" not in data.keys():
         data["LAB"] = ""
     return render_template('student/s_assessment_detail.html', crs = course, marks = data)
+
+@app.route("/s_attendance", methods = ['GET','POST'])
+@login_required
+def s_attendance():
+    
+    USN = Student.query.filter_by(s_email_id = current_user.email_id).first().usn
+    data = mongo.db.attd.find_one({ "usn" : USN })
+
+    course_code_list = StudentCourseDetails.query.filter_by(s_email_id = current_user.email_id, date = date(2020, 7, 1))
+    
+    course_list = []
+    form_list = []
+
+    for each in course_code_list:
+        course = Course.query.filter_by(course_code = each.course_code).first()
+        # print(course)
+        course_list.append(course)
+
+        form = FileInputForm()
+        form.course_code = each.course_code
+        form_list.append(form)
+
+    return render_template('student/s_attendance.html', attd = data, courses = course_list, forms = form_list)

@@ -12,6 +12,8 @@ class Config(object):
 
     MONGO_URI = os.environ.get('MONGO_DATABSE_URI') or 'mongodb://localhost:27017/test'
 
+    MAX_CONTENT_LENGTH = 500 * 1024 
+    
     # define a folder to store and later serve the images
     UPLOAD_FOLDER = '/uploads/'
 
