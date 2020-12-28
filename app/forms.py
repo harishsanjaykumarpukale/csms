@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField, DateField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField, DateField, FloatField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
 from app.models import User,Student
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 import re
@@ -104,3 +104,7 @@ class HSSActivityDetailForm(FlaskForm):
     description = TextAreaField('Description', validators=[Length(min=8, max=100)])
     file = FileField('Choose the PDF file', validators = [FileRequired(), FileAllowed(['pdf'],"PDF only")])
     submit = SubmitField('Submit')
+
+class CGPAForm(FlaskForm):
+    l_limit = SelectField('Lower Limit',choices=[7,7.5,8,8.5,9,9.5,10],validators=[DataRequired()])
+    submit = SubmitField('Find')

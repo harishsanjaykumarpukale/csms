@@ -6,6 +6,9 @@ from app.models import *
 from werkzeug.urls import url_parse
 from OCR.ocr_student_pdf import get_student_details
 from datetime import date
+from bson.json_util import dumps
+from pdfkit import from_string
+from flask.helpers import make_response
 
 # allow files of a specific type
 ALLOWED_EXTENSIONS = set(['pdf'])
@@ -226,6 +229,7 @@ def s_attendance():
     
     USN = Student.query.filter_by(s_email_id = current_user.email_id).first().usn
     data = mongo.db.attd.find_one({ "usn" : USN })
+    print(data)
 
     course_code_list = StudentCourseDetails.query.filter_by(s_email_id = current_user.email_id, date = date(2020, 7, 1))
     
@@ -253,6 +257,7 @@ def too_large(e):
     return "File is too large", 413
 
 @app.route("/s_attendance_update", methods = ["GET", "POST"])
+@login_required
 def s_attendance_update():
     form = FileInputForm()
     code = request.args.get('course_code', "18CS52", type=str)
@@ -284,10 +289,38 @@ def s_attendance_update():
     return render_template('student/s_attendance_update.html', form = form)
 
 @app.route("/s_hss", methods = ["GET", "POST"])
+@login_required
 def s_hss():
     form = HSSActivityDetailForm()
     if form.validate_on_submit():
-        
+
         flash("HSS Actvity details submitted succesfully!! ", "success")
         return redirect(url_for('s_hss'))
     return render_template('student/s_hss.html', form = form)
+
+@app.route("/c_report", methods = ["GET", "POST"])
+@login_required
+def c_report():
+    form = CGPAForm()
+    if request.method == 'POST':
+        lmt = form.l_limit.data
+        data = mongo.db.grade.find({ "cgpa" : { "$gt" : float(lmt) } })
+        # data = mongo.db.grade.find({ })
+        final = list(data)
+        return render_template('counsellor/c_report.html', form = form, data = final, cgpa = float(lmt))
+    return render_template('counsellor/c_report.html', form = form)
+
+@app.route("/download")
+def download():
+    cgpa = request.args.get('cgpa', 7.0 , type = float)
+    print(cgpa)
+    data = mongo.db.grade.find({ "cgpa" : { "$gt" : cgpa } })
+    data = list(data)
+    rendered = render_template('counsellor/report.html', data = data)
+    pdf = from_string(rendered, False)
+
+    response = make_response(pdf)
+    response.headers['Content-Type'] = "application/pdf"
+    response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
+
+    return response

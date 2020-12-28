@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Give the lower limit </legend>
+
+            <div class="form-group">
+                {{ form.l_limit.label(class="form-control-label") }}
+                {% if form.l_limit.errors %}
+                    {{ form.l_limit(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.l_limit.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.l_limit(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+
+{% if data %}
+{% for each in data %}
+    <p>{{each["usn"]}}</p>
+{% endfor %}
+<p>Press Download to View/Download the results </p>
+<a href = "/download?cgpa={{cgpa}}" class="btn btn-primary btn-block col-md-2">Download</a>
+{% endif %}
+
+{% endblock %}
