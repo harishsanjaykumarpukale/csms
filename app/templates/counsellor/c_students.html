@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Students</h1>
+<br>
+<br>
+<div class="content-section">
+    <ul class="list-group">
+        {% for each in students %}
+        <a href="{{ url_for('c_student_detail', email_id = each.s_email_id)}}" class="btn-lg btn-primary btn-block col-md-8">{{each.usn}} - {{each.f_name}} {{each.l_name}}</a>
+        <br>
+        <br>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

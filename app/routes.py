@@ -293,7 +293,6 @@ def s_attendance_update():
 def s_hss():
     form = HSSActivityDetailForm()
     if form.validate_on_submit():
-
         flash("HSS Actvity details submitted succesfully!! ", "success")
         return redirect(url_for('s_hss'))
     return render_template('student/s_hss.html', form = form)
@@ -313,7 +312,7 @@ def c_report():
 @app.route("/download")
 def download():
     cgpa = request.args.get('cgpa', 7.0 , type = float)
-    print(cgpa)
+    # print(cgpa)
     data = mongo.db.grade.find({ "cgpa" : { "$gt" : cgpa } })
     data = list(data)
     rendered = render_template('counsellor/report.html', data = data)
@@ -324,3 +323,18 @@ def download():
     response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
 
     return response
+
+
+@app.route("/c_students")
+@login_required
+def c_students():
+    counsellor = Counsellor.query.filter_by(c_email_id = current_user.email_id).first()
+    return render_template('counsellor/c_students.html', students = counsellor.counsellees)
+
+
+@app.route("/c_student_detail/<email_id>")
+@login_required
+def c_student_detail(email_id):
+    # print(email_id)
+    student = Student.query.filter_by(s_email_id = email_id).first()
+    return render_template('counsellor/c_student_detail.html', student = student)
