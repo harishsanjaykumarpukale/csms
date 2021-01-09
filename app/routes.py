@@ -338,3 +338,21 @@ def c_student_detail(email_id):
     # print(email_id)
     student = Student.query.filter_by(s_email_id = email_id).first()
     return render_template('counsellor/c_student_detail.html', student = student)
+
+@app.route("/c_search_usn", methods = ["GET","POST"])
+@login_required
+def c_search_usn():
+    form = SearchUSNForm()
+
+    if form.validate_on_submit() and request.method == "POST" :
+        if form.last_3_digits.data < 100:
+            USN = "1RV18" + form.dept.data[0:2] + "0" + str(form.last_3_digits.data)
+        else:
+            USN = "1RV18" + form.dept.data[0:2] + str(form.last_3_digits.data)
+        student = Student.query.filter_by(usn = USN).first()
+        if student is None:
+            flash("No student found","danger")
+            return redirect(url_for('c_search_usn'))
+        return redirect(url_for('c_student_detail', email_id = student.s_email_id))
+
+    return render_template('counsellor/c_search_usn.html', form = form)
