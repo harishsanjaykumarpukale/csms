@@ -67,7 +67,12 @@ def account():
 @app.route("/s_home")
 @login_required
 def s_home():
-    return render_template('student/s_home.html')
+    student = Student.query.filter_by(s_email_id = current_user.email_id).first()
+    USN = student.usn
+    grade = mongo.db.grade.find_one({ "usn" : USN})
+    if grade is not None:
+        return render_template('student/s_home.html', cgpa = grade['cgpa'])
+    return render_template('student/s_home.html', cgpa = "" )
 
 @app.route("/c_home")
 @login_required
