@@ -8,7 +8,9 @@ from OCR.ocr_student_pdf import get_student_details
 from datetime import date
 from bson.json_util import dumps
 from pdfkit import from_string
-from flask.helpers import make_response
+from flask.helpers import make_response, send_file
+from bson.binary import Binary
+from bson.objectid import ObjectId
 
 # allow files of a specific type
 ALLOWED_EXTENSIONS = set(['pdf'])
@@ -259,7 +261,7 @@ def s_attendance():
 
 @app.errorhandler(413)
 def too_large(e):
-    return "File is too large", 413
+    return "File is too large please upload smaller file", 413
 
 @app.route("/s_attendance_update", methods = ["GET", "POST"])
 @login_required
@@ -285,8 +287,17 @@ def s_attendance_update():
             return redirect(url_for('s_attendance_update'))
         
         if file and allowed_file(file.filename):
-            
+            student = Student.query.filter_by(s_email_id = current_user.email_id).first()
+            mongo.db.reqs.update_one( { "email" : student.c_email_id }, { "$push" : { "attdreqs" : { "_id" : ObjectId() ,"code" : code, "usn" : student.usn , "approved" : False , "file" : file.read()}}})
 
+            # mongo.db.docs.insert_one({ 'file' : file.read()})
+            # s = mongo.db.docs.find_one({})
+            # s = s['file']
+            # response = make_response(s)
+            # response.headers['Content-Type'] = "application/pdf"
+            # response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
+
+            # return response
             flash("File uploaded succesfully!! ","success")
 
             return redirect(url_for('s_attendance'))
@@ -298,8 +309,39 @@ def s_attendance_update():
 def s_hss():
     form = HSSActivityDetailForm()
     if form.validate_on_submit():
-        flash("HSS Actvity details submitted succesfully!! ", "success")
-        return redirect(url_for('s_hss'))
+        # check if there is a file in the request
+        if 'file' not in request.files:
+            flash("No file selected","error")
+            return redirect(url_for('s_hss'))
+        
+        file = request.files['file']
+        
+        # if no file is selected
+        if file.filename == '':
+            flash("No file selected","error")
+            return redirect(url_for('s_hss'))
+        
+        if not allowed_file(file.filename):
+            flash("Only PDF files allowed ","error")
+            return redirect(url_for('s_hss'))
+        
+        if file and allowed_file(file.filename):
+            student = Student.query.filter_by(s_email_id = current_user.email_id).first()
+            mongo.db.reqs.update_one( { "email" : student.c_email_id }, { "$push" : { "hssreqs" : { "usn" : student.usn , "approved" : False , "activity" : { "title" : form.title.data, "descrption" : form.description.data, "file" : file.read()}}}})
+
+            # mongo.db.docs.insert_one({ 'file' : file.read()})
+            # s = mongo.db.docs.find_one({})
+            # s = s['file']
+
+            # s = mongo.db.reqs.find_one({ "email" : student.c_email_id})
+            # s = s["hssreqs"][0]["activity"]["file"]
+            # response = make_response(s)
+            # response.headers['Content-Type'] = "application/pdf"
+            # response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
+
+            # return response
+            flash("HSS Actvity details submitted succesfully!! ", "success")
+            return redirect(url_for('s_home'))
     return render_template('student/s_hss.html', form = form)
 
 @app.route("/c_report", methods = ["GET", "POST"])
@@ -361,3 +403,47 @@ def c_search_usn():
         return redirect(url_for('c_student_detail', email_id = student.s_email_id))
 
     return render_template('counsellor/c_search_usn.html', form = form)
+
+@app.route("/notification", methods = ["GET","POST"])
+@login_required
+def notification():
+    q = mongo.db.reqs.find_one({ "email" : current_user.email_id})
+    attd_l = q["attdreqs"]
+    pending_attd_l = []
+    for each in attd_l:
+        if each["approved"] is False:
+            pending_attd_l.append(each)
+    
+    if 'view' in request.args.keys():
+        
+        id = request.args.get('id','0',type = ObjectId)
+        # print(id)
+        for each in pending_attd_l:
+            # print(each["_id"])
+            if each["_id"] == id:
+                # print("found")
+                file = each["file"]
+                response = make_response(file)
+                response.headers['Content-Type'] = "application/pdf"
+                response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
+                return response
+    
+    return render_template('notification.html', ac = len(pending_attd_l), al = pending_attd_l)
+
+
+@app.route("/update_attendance")
+@login_required
+def update_attendance():
+    usn = request.args.get('usn','0',type = str)
+    code = request.args.get('code','code', type = str)
+    id = request.args.get('id','0',type = ObjectId)
+    if usn == "0" or code == "code" :
+        return 404
+    a = mongo.db.attd.find_one({ "usn" : usn })
+    total = a[code]["total"]
+    p = a[code]["percentage"] + 100/total
+    p = round(p,2)
+    mongo.db.attd.update_one({ "usn" : usn} , { "$set" : { code+".percentage" : p}})
+    mongo.db.reqs.update_one({ "email" : current_user.email_id , "attdreqs._id" : id}, { "$set" : { "attdreqs.$.approved" : True}})
+    flash("Attendance Updated Successfully!!","success")
+    return redirect(url_for('notification'))
