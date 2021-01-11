@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head>Report
+<head>Report (CGPA > {{cgpa}}) 
 </head>
 <body>
 <main> 
 <ul>
     {% for each in data %}
-    <p>{{each['usn']}}</p>
+    <p>{{each.usn}} - {{each.f_name}} {{each.l_name}}</p>
     {% endfor %}
-</ul>
+</ul> 
 </main>
 </body>
 </html>

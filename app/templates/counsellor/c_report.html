@@ -30,10 +30,10 @@
 
 {% if data %}
 {% for each in data %}
-    <p>{{each["usn"]}}</p>
+    <p>{{each.usn}} - {{each.f_name}} {{each.l_name}}</p>
 {% endfor %}
-<p>Press Download to View/Download the results </p>
-<a href = "/download?cgpa={{cgpa}}" class="btn btn-primary btn-block col-md-2">Download</a>
+<br>
+<a href = "/download?cgpa={{cgpa}}" class="btn btn-primary btn-block col-md-4">View / Download PDF</a>
 {% endif %}
 
 {% endblock %}

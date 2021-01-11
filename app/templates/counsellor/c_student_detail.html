@@ -9,4 +9,13 @@
     <h2>email-id - {{student.s_email_id}}</h2>
     <br>
 </div>
+<div class="card">
+    <div class="card-body">
+      <h4 class="card-title">More Details</h4>
+      <!-- <p class="card-text">Some example text. Some example text.</p> -->
+      <a href="{{ url_for('assessment')}}?email={{student.s_email_id}}" class="card-link">Academic </a>
+      <a href="{{ url_for('attendance')}}?email={{student.s_email_id}}" class="card-link">Attendance</a>
+      
+    </div>
+</div>
 {% endblock %}

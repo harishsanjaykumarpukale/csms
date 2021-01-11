@@ -99,7 +99,7 @@ class FileInputForm(FlaskForm):
     #     raise ValidationError(len(file.data))
 
 class HSSActivityDetailForm(FlaskForm):
-    title = StringField('Title', validators=[Length(min=5, max=8)])
+    title = StringField('Title', validators=[Length(min=5, max=15)])
     date = DateField('Date in YYYY-MM-DD', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[Length(min=8, max=100)])
     file = FileField('Choose the PDF file', validators = [FileRequired(), FileAllowed(['pdf'],"PDF only")])

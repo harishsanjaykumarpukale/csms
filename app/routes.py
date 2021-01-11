@@ -84,7 +84,8 @@ def c_home():
 @app.route("/p_home")
 @login_required
 def p_home():
-    return render_template('parent/p_home.html')
+    parent = Parent.query.filter_by(p_email_id=current_user.email_id).first()
+    return render_template('parent/p_home.html', email=parent.s_email_id)
 
 @app.route("/s_register", methods = ['GET','POST'])
 def s_register():
@@ -174,7 +175,7 @@ def reg_ocr():
         
         if file and allowed_file(file.filename):
             student = get_student_details(file.read())
-            print(student)
+            # print(student)
             user = User(email_id = student['s_email'], type = "student")
             userexists = User.query.filter_by(email_id=user.email_id).first()
             if userexists is not None:
@@ -210,6 +211,25 @@ def s_assessment():
     
     return render_template('student/s_assessment.html', courses = course_list)
 
+
+@app.route("/assessment")
+@login_required
+def assessment():
+
+    email = request.args.get('email','default',type=str)
+
+    course_code_list = StudentCourseDetails.query.filter_by(s_email_id = email, date = date(2020, 7, 1))
+    
+    course_list = []
+
+    for each in course_code_list:
+        course = Course.query.filter_by(course_code = each.course_code).first()
+        # print(course)
+        course_list.append(course)
+    
+    return render_template('assessment.html', courses = course_list, email = email)
+  
+
 @app.route("/s_assessment_detail")
 @login_required
 def s_assessment_detail():
@@ -217,7 +237,25 @@ def s_assessment_detail():
     course = Course.query.filter_by(course_code = code).first()
     USN = Student.query.filter_by(s_email_id = current_user.email_id).first().usn 
     marks = mongo.db.marks.find_one( { "usn" : USN })
-    data = marks["5"][code]
+    data = marks[code]
+    keys = ['Q1','CIE1','Q2','CIE2','Q3','CIE3']
+    for each in keys:
+        if each not in data.keys():
+            data[each] = ""
+    if data["lab"] and "LAB" not in data.keys():
+        data["LAB"] = ""
+    return render_template('student/s_assessment_detail.html', crs = course, marks = data)
+
+@app.route("/assessment_detail")
+@login_required
+def assessment_detail():
+
+    email = request.args.get('email','default',type=str)
+    code = request.args.get('course_code', "18CS52", type=str)
+    course = Course.query.filter_by(course_code = code).first()
+    USN = Student.query.filter_by(s_email_id = email).first().usn 
+    marks = mongo.db.marks.find_one( { "usn" : USN })
+    data = marks[code]
     keys = ['Q1','CIE1','Q2','CIE2','Q3','CIE3']
     for each in keys:
         if each not in data.keys():
@@ -236,7 +274,7 @@ def s_attendance():
     
     USN = Student.query.filter_by(s_email_id = current_user.email_id).first().usn
     data = mongo.db.attd.find_one({ "usn" : USN })
-    print(data)
+    # print(data)
 
     course_code_list = StudentCourseDetails.query.filter_by(s_email_id = current_user.email_id, date = date(2020, 7, 1))
     
@@ -257,6 +295,30 @@ def s_attendance():
     #     return redirect(url_for('s_attendance'))
 
     return render_template('student/s_attendance.html', attd = data, courses = course_list, forms = form_list)
+
+@app.route("/attendance")
+@login_required
+def attendance():
+
+
+    email = request.args.get('email','default',type=str)
+    USN = Student.query.filter_by(s_email_id = email).first().usn
+    data = mongo.db.attd.find_one({ "usn" : USN })
+    # print(data)
+
+    course_code_list = StudentCourseDetails.query.filter_by(s_email_id = email, date = date(2020, 7, 1))
+    
+    course_list = []
+
+    for each in course_code_list:
+        course = Course.query.filter_by(course_code = each.course_code).first()
+        # print(course)
+        course_list.append(course)
+    
+    
+
+    return render_template('attendance.html', attd = data, courses = course_list)
+
 
 
 @app.errorhandler(413)
@@ -327,10 +389,10 @@ def s_hss():
         
         if file and allowed_file(file.filename):
             student = Student.query.filter_by(s_email_id = current_user.email_id).first()
-            mongo.db.reqs.update_one( { "email" : student.c_email_id }, { "$push" : { "hssreqs" : { "usn" : student.usn , "approved" : False , "activity" : { "title" : form.title.data, "descrption" : form.description.data, "file" : file.read()}}}})
+            mongo.db.reqs.update_one( { "email" : student.c_email_id }, { "$push" : { "hssreqs" : { "_id" : ObjectId(),"usn" : student.usn , "approved" : False , "activity" : { "title" : form.title.data, "descrption" : form.description.data, "file" : file.read()}}}})
 
             # mongo.db.docs.insert_one({ 'file' : file.read()})
-            # s = mongo.db.docs.find_one({})
+            # s = mongo.dbdb.reqs.insertOne( { email : "vinayvhegde@rvce.edu.in", attdreqs : [], hssreqs : [] }  ).docs.find_one({})
             # s = s['file']
 
             # s = mongo.db.reqs.find_one({ "email" : student.c_email_id})
@@ -353,7 +415,13 @@ def c_report():
         data = mongo.db.grade.find({ "cgpa" : { "$gt" : float(lmt) } })
         # data = mongo.db.grade.find({ })
         final = list(data)
-        return render_template('counsellor/c_report.html', form = form, data = final, cgpa = float(lmt))
+        students = []
+        for each in final:
+            s = Student.query.filter_by(usn = each['usn']).first()
+            if s is not None:
+                students.append(s)
+                
+        return render_template('counsellor/c_report.html', form = form, data = students, cgpa = float(lmt))
     return render_template('counsellor/c_report.html', form = form)
 
 @app.route("/download")
@@ -362,7 +430,12 @@ def download():
     # print(cgpa)
     data = mongo.db.grade.find({ "cgpa" : { "$gt" : cgpa } })
     data = list(data)
-    rendered = render_template('counsellor/report.html', data = data)
+    students = []
+    for each in data:
+        s = Student.query.filter_by(usn = each['usn']).first()
+        if s is not None:
+            students.append(s)
+    rendered = render_template('counsellor/report.html', data = students, cgpa=cgpa)
     pdf = from_string(rendered, False)
 
     response = make_response(pdf)
@@ -413,6 +486,13 @@ def notification():
     for each in attd_l:
         if each["approved"] is False:
             pending_attd_l.append(each)
+        
+    hss_l = q["hssreqs"]
+    pending_hss_l = []
+    for each in hss_l:
+        if each["approved"] is False:
+            pending_hss_l.append(each)
+    
     
     if 'view' in request.args.keys():
         
@@ -428,7 +508,7 @@ def notification():
                 response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
                 return response
     
-    return render_template('notification.html', ac = len(pending_attd_l), al = pending_attd_l)
+    return render_template('notification.html', ac = len(pending_attd_l), al = pending_attd_l, hc = len(pending_hss_l), hl = pending_hss_l)
 
 
 @app.route("/update_attendance")
@@ -447,3 +527,5 @@ def update_attendance():
     mongo.db.reqs.update_one({ "email" : current_user.email_id , "attdreqs._id" : id}, { "$set" : { "attdreqs.$.approved" : True}})
     flash("Attendance Updated Successfully!!","success")
     return redirect(url_for('notification'))
+
+  
