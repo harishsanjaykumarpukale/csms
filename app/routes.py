@@ -507,6 +507,16 @@ def notification():
                 response.headers['Content-Type'] = "application/pdf"
                 response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
                 return response
+        
+        for each in pending_hss_l:
+            # print(each["_id"])
+            if each["_id"] == id:
+                # print("found")
+                file = each["activity"]["file"]
+                response = make_response(file)
+                response.headers['Content-Type'] = "application/pdf"
+                response.headers['Content-Dispostion'] = 'inline; filename=report.pdf'
+                return response
     
     return render_template('notification.html', ac = len(pending_attd_l), al = pending_attd_l, hc = len(pending_hss_l), hl = pending_hss_l)
 
@@ -528,4 +538,10 @@ def update_attendance():
     flash("Attendance Updated Successfully!!","success")
     return redirect(url_for('notification'))
 
-  
+@app.route("/update_hss")
+@login_required
+def update_hss():
+    id = request.args.get('id','0',type = ObjectId)
+    mongo.db.reqs.update_one({ "email" : current_user.email_id , "hssreqs._id" : id}, { "$set" : { "hssreqs.$.approved" : True}})
+    flash("Updated Successfully!!","success")
+    return redirect(url_for('notification'))
