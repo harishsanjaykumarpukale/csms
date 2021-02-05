@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1> Notifications </h1>
+    {% for each in msgs %}
+    <br>
+    <p>{{each}}</p>
+    <br>
+    {% endfor %}
+{% endblock %}

@@ -12,7 +12,33 @@
               <!-- <p class="card-text">Some example text. Some example text.</p> -->
               <a href="/notification?view=true&id={{each['_id']}}" class="card-link">View File </a>
               <a href="/update_attendance?usn={{each['usn']}}&id={{each['_id']}}&code={{each['code']}}" class="card-link">Approve</a>
-              
+              <a href="#reject" class="card-link" data-toggle="modal" >Reject</a>
+              <br>
+              <!-- <button type="button" class="btn" data-toggle="modal" data-target="#reject">
+                Launch demo modal
+              </button> -->
+
+              <!-- Modal -->
+              <div class="modal fade" id="reject" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" >Reject Request</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure you want to reject?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                      <!-- <button type="button" class="btn btn-secondary">Yes</button> -->
+                      <a href="/reject_attd_req?usn={{each['usn']}}&id={{each['_id']}}&code={{each['code']}}" class="btn btn-secondary">Yes</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
         </div>
         <br>
@@ -30,7 +56,33 @@
           <p class="card-text">{{each["activity"]["title"]}}</p>
           <a href="/notification?view=true&id={{each['_id']}}" class="card-link">View File </a>
           <a href="/update_hss?usn={{each['usn']}}&id={{each['_id']}}" class="card-link">Approve</a>
+          <a href="#reject" class="card-link" data-toggle="modal" >Reject</a>
+              <br>
+              <!-- <button type="button" class="btn" data-toggle="modal" data-target="#reject">
+                Launch demo modal
+              </button> -->
 
+              <!-- Modal -->
+              <div class="modal fade" id="reject" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" >Reject Request</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure you want to reject?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                      <!-- <button type="button" class="btn btn-secondary">Yes</button> -->
+                      <a href="/reject_hss_req?usn={{each['usn']}}&id={{each['_id']}}" class="btn btn-secondary">Yes</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </div>
     </div>
     <br>

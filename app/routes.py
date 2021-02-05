@@ -549,3 +549,43 @@ def update_hss():
     mongo.db.reqs.update_one({ "email" : current_user.email_id , "hssreqs._id" : id}, { "$set" : { "hssreqs.$.approved" : True}})
     flash("Updated Successfully!!","success")
     return redirect(url_for('notification'))
+
+
+@app.route("/reject_attd_req")
+@login_required
+def reject_attd_req():
+    usn = request.args.get('usn','0',type = str)
+    code = request.args.get('code','code', type = str)
+    id = request.args.get('id','0',type = ObjectId)
+    if usn == "0" or code == "code" or id == '0':
+        return 404
+    mongo.db.reqs.update_one( { "email" : current_user.email_id }, { "$pull" : { "attdreqs" : { "_id" : id}}})
+    mongo.db.notf.update_one( { "usn" : usn }, { "$push" : { "msgs" : { "seen" : False,"msg" : "Your request for the approval of Attendnace Update in Course - " + code + "is rejected " }}})
+    flash("Rejected and Notified Student")
+    return redirect(url_for('notification'))
+
+@app.route("/reject_hss_req")
+@login_required
+def reject_hss_req():
+    usn = request.args.get('usn','0',type = str)
+    id = request.args.get('id','0',type = ObjectId)
+    if id == '0' or usn == '0':
+        return 404
+    mongo.db.reqs.update_one( { "email" : current_user.email_id }, { "$pull" : { "hssreqs" : { "_id" : id}}})
+    mongo.db.notf.update_one( { "usn" : usn }, { "$push" : { "msgs" : { "seen" : False,"msg" : "Your request for the approval of HSS Activity is rejected " }}})
+    flash("Rejected and Notified Student")
+    return redirect(url_for('notification'))
+
+
+@app.route("/s_notification")
+@login_required
+def s_notification():
+    student = Student.query.filter_by(s_email_id = current_user.email_id).first()
+    q = mongo.db.notf.find_one( { "usn" : student.usn})
+    mongo.db.notf.update_many( { "usn" : student.usn, "msgs.seen" : False}, { "$set" : { "msgs.$.seen" : True}})
+    msgs = q['msgs']
+    pending_msgs = []
+    for each in msgs:
+        if each['seen'] is False:
+            pending_msgs.append(each['msg'])
+    return render_template('student/s_notification.html', msgs = pending_msgs)

@@ -34,6 +34,8 @@
               {% if current_user.is_authenticated %}
                 {% if current_user.type == "counsellor" %}
                   <a class="nav-item nav-link" href="{{ url_for('notification') }}">Notification</a>
+                {% elif current_user.type == "student" %}
+                  <a class="nav-item nav-link" href="{{ url_for('s_notification') }}">Notification</a>
                 {% endif %}
                 <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                 <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
