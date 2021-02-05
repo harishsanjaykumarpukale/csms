@@ -29,7 +29,7 @@
           <h4 class="card-title">{{each["usn"]}}</h4>
           <p class="card-text">{{each["activity"]["title"]}}</p>
           <a href="/notification?view=true&id={{each['_id']}}" class="card-link">View File </a>
-          <a href="/update_hss?id={{each['_id']}}" class="card-link">Approve</a>
+          <a href="/update_hss?usn={{each['usn']}}&id={{each['_id']}}" class="card-link">Approve</a>
 
         </div>
     </div>

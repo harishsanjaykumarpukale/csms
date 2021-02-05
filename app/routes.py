@@ -73,8 +73,8 @@ def s_home():
     USN = student.usn
     grade = mongo.db.grade.find_one({ "usn" : USN})
     if grade is not None:
-        return render_template('student/s_home.html', cgpa = grade['cgpa'])
-    return render_template('student/s_home.html', cgpa = "" )
+        return render_template('student/s_home.html', cgpa = grade['cgpa'], hss = grade['hss'])
+    return render_template('student/s_home.html', cgpa = "" , hss = "")
 
 @app.route("/c_home")
 @login_required
@@ -527,7 +527,7 @@ def update_attendance():
     usn = request.args.get('usn','0',type = str)
     code = request.args.get('code','code', type = str)
     id = request.args.get('id','0',type = ObjectId)
-    if usn == "0" or code == "code" :
+    if usn == "0" or code == "code" or id == '0':
         return 404
     a = mongo.db.attd.find_one({ "usn" : usn })
     total = a[code]["total"]
@@ -541,7 +541,11 @@ def update_attendance():
 @app.route("/update_hss")
 @login_required
 def update_hss():
+    usn = request.args.get('usn','0',type = str)
     id = request.args.get('id','0',type = ObjectId)
+    if usn == "0" or id == '0':
+        return 404
+    mongo.db.grade.update_one( { "usn" : usn}, { "$inc" : { "hss" : 1}})
     mongo.db.reqs.update_one({ "email" : current_user.email_id , "hssreqs._id" : id}, { "$set" : { "hssreqs.$.approved" : True}})
     flash("Updated Successfully!!","success")
     return redirect(url_for('notification'))
